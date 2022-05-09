@@ -5,14 +5,13 @@ from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
-from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import TimeoutException, ElementNotInteractableException
 import time
 import sys
 
 id_username = input("Masukkan username: ")
 id_password = input("Masukkan password: ")
 kelas = int(input("Masukkan jumlah kelas: "))
-# unkelas = list(input("Masukkan nomor kelas yang akan di-Hits (ex. 1234"))
 repetisi = float(input("Masukkan jumlah hits yang diinginkan tiap kelas: "))
 
 url = "https://elearning.ut.ac.id/login/index.php"
@@ -30,7 +29,6 @@ service = ChromeService(executable_path=ChromeDriverManager().install())
 driver = webdriver.Chrome(service=service, options=opts)
 driver.get(f"{url}")
 
-# Login
 print("*** Attempt to login")
 WebDriverWait(driver, 20).until(ec.presence_of_element_located((By.ID, "username")))
 
@@ -42,19 +40,20 @@ driver.find_element(By.ID, 'loginbtn').click()
 print("*** Login Succesfully")
 print("============================")
 
-# Course
 for i in range(kelas):
-    # if i != 3:
-    #     continue
     WebDriverWait(driver, 20).until(ec.presence_of_element_located((By.CLASS_NAME, "aalink")))
     time.sleep(5)
     courses = driver.find_elements(By.CLASS_NAME, 'aalink')
     print(courses[i].text.strip())
-    courses[i].click()  # Course ke-i
+    courses[i].click()
     WebDriverWait(driver, 20).until(ec.presence_of_element_located((By.CLASS_NAME, "nav-item")))
     for x in range(repetisi1):
-        nav_items = driver.find_elements(By.CLASS_NAME, 'nav-item')
-        nav_items[1].click()
+        try:
+            nav_items = driver.find_elements(By.CLASS_NAME, 'nav-item')
+            nav_items[1].click()
+        except ElementNotInteractableException:
+            pass
+
         try:
             WebDriverWait(driver, 20).until(ec.presence_of_element_located((By.CLASS_NAME, "nav-item")))
         except TimeoutException:
@@ -64,8 +63,13 @@ for i in range(kelas):
                 if WebDriverWait(driver, 20).until(ec.presence_of_element_located((By.CLASS_NAME, "item-dashboard"))):
                     break
             pass
-        nav_items = driver.find_elements(By.CLASS_NAME, 'nav-item')
-        nav_items[0].click()
+
+        try:
+            nav_items = driver.find_elements(By.CLASS_NAME, 'nav-item')
+            nav_items[0].click()
+        except ElementNotInteractableException:
+            pass
+
         try:
             WebDriverWait(driver, 20).until(ec.presence_of_element_located((By.CLASS_NAME, "item-dashboard")))
         except TimeoutException:
@@ -75,9 +79,10 @@ for i in range(kelas):
                 if WebDriverWait(driver, 20).until(ec.presence_of_element_located((By.CLASS_NAME, "item-dashboard"))):
                     break
             pass
+
         sys.stdout.write(f"\rNumber of Hits : {(x + 1) * 2}")
         sys.stdout.flush()
-        # print(f"Hits : {(x + 1) * 2}")
+
     print("\nDone!")
     driver.find_element(By.CLASS_NAME, 'item-dashboard').click()
     print("============================")
