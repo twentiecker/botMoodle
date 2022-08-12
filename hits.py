@@ -41,7 +41,18 @@ print("*** Login Succesfully")
 print("============================")
 
 for i in range(kelas):
-    WebDriverWait(driver, 20).until(ec.presence_of_element_located((By.CLASS_NAME, "aalink")))
+    try:
+        WebDriverWait(driver, 20).until(ec.presence_of_element_located((By.CLASS_NAME, "aalink")))
+    except TimeoutException:
+        for j in range(3):
+            print(f"*** Attempt to refresh ({j})")
+            driver.refresh()
+            try:
+                WebDriverWait(driver, 20).until(ec.presence_of_element_located((By.CLASS_NAME, "aalink")))
+                break
+            except:
+                continue
+        pass
     time.sleep(5)
     courses = driver.find_elements(By.CLASS_NAME, 'aalink')
     print(courses[i].text.strip())
