@@ -12,6 +12,15 @@ import sys
 id_username = input("Masukkan username: ")
 id_password = input("Masukkan password: ")
 kelas = int(input("Masukkan jumlah kelas: "))
+
+while True:
+    n = list(map(int, input("Kelas yang akan di-hits (ex. 1 3 4): ").strip().split()))
+    n.sort()
+    if (len(n) > kelas) or (n[len(n)-1] > kelas):
+        print(f"Kelas yang akan di-hits diluar range")
+    else:
+        break
+
 repetisi = float(input("Masukkan jumlah hits yang diinginkan tiap kelas: "))
 
 url = "https://elearning.ut.ac.id/login/index.php"
@@ -40,7 +49,7 @@ driver.find_element(By.ID, 'loginbtn').click()
 print("*** Login Succesfully")
 print("============================")
 
-for i in range(kelas):
+for i in range(len(n)):
     try:
         WebDriverWait(driver, 20).until(ec.presence_of_element_located((By.CLASS_NAME, "aalink")))
     except TimeoutException:
@@ -55,8 +64,8 @@ for i in range(kelas):
         pass
     time.sleep(5)
     courses = driver.find_elements(By.CLASS_NAME, 'aalink')
-    print(courses[i].text.strip())
-    courses[i].click()
+    print(courses[n[i]-1].text.strip())
+    courses[n[i]-1].click()
     WebDriverWait(driver, 20).until(ec.presence_of_element_located((By.CLASS_NAME, "nav-item")))
     for x in range(repetisi1):
         try:

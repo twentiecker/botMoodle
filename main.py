@@ -12,5 +12,14 @@ def print_hi(name):
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     print_hi('PyCharm')
+    a = int(input("Number of class:-"))
+    n = list(map(int, input("elements of array:-").strip().split()))
+    # print(n)
+    # tes_aray = [1,5,7]
+    print(n)
+    n.sort()
+    print(n)
+    for x in range(len(n)):
+        print(n[x])
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
